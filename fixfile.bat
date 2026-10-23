@@ -1,10 +1,19 @@
 @echo off
 setlocal
-
-REM Change to the directory of this batch file
-cd /d "%~dp0"
-
-REM Run the Python script in this same directory
-python fixfile.py
-
+where python >nul 2>&1
+if errorlevel 1 (
+    echo ERROR: Python 3.11 or newer is required. Install Python and enable its PATH option. 1>&2
+    if "%~1"=="" pause
+    exit /b 2
+)
+if not "%~1"=="" goto run
+pushd "%~dp0" || exit /b 1
+python "%~dp0fixfile.py"
+set "result=%errorlevel%"
+popd
+echo.
 pause
+exit /b %result%
+:run
+python "%~dp0fixfile.py" %*
+exit /b %errorlevel%
